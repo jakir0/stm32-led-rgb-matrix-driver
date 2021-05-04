@@ -66,14 +66,18 @@ void Error_Handler(void);
 #define USART_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
-#define LE_Pin GPIO_PIN_8
-#define LE_GPIO_Port GPIOC
+#define LATCH_Pin GPIO_PIN_6
+#define LATCH_GPIO_Port GPIOC
+#define Enable_Pin GPIO_PIN_8
+#define Enable_GPIO_Port GPIOC
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
+#define GCLK_Pin GPIO_PIN_9
+#define GCLK_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
