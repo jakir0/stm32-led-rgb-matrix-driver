@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NUMBER_OF_DRIVERS 5
+#define NUMBER_OF_DRIVERS 3
 
 /* USER CODE END PD */
 
@@ -55,8 +55,8 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
-uint8_t transmit_buff[321],
-		recive_buff[321],
+uint8_t transmit_buff[(16*4*NUMBER_OF_DRIVERS)+1],
+		recive_buff[(16*4*NUMBER_OF_DRIVERS)+1],
 		command_buff[2],
 		is_connected = 0,
 		waiting_for_frame = 0,
@@ -290,7 +290,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 79;
+  htim3.Init.Period = (NUMBER_OF_DRIVERS*16)-1;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -316,7 +316,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 79;
+  sConfigOC.Pulse = (NUMBER_OF_DRIVERS*16)-1;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
@@ -504,7 +504,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 				}
 				HAL_UART_Transmit_DMA(&huart2, command_buff, 1);
 				waiting_for_frame = 1;
-				HAL_UART_Receive_DMA(&huart2, recive_buff, 320);
+				HAL_UART_Receive_DMA(&huart2, recive_buff, 16*4*NUMBER_OF_DRIVERS);
 				break;
 
 			default:
@@ -513,7 +513,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		}
 	}else{
 		waiting_for_frame = 0;
-		HAL_UART_Transmit_DMA(&huart2, recive_buff, 320);
+		HAL_UART_Transmit_DMA(&huart2, recive_buff, 16*4*NUMBER_OF_DRIVERS);
 		recieve_buffer_full = 1;
 		HAL_UART_Receive_DMA(&huart2, command_buff, 1);
 	}
@@ -521,8 +521,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
 	if (hspi==&hspi2){
+
 		HAL_GPIO_WritePin(Enable_GPIO_Port, Enable_Pin, GPIO_PIN_SET);
-		//HAL_TIM_PWM_Start_IT(&htim11, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start_IT(&htim11, TIM_CHANNEL_1);
+
 	}
 }
 
@@ -534,7 +536,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 			number_of_pulses++;
 		}
 		else if(number_of_pulses==14){
-			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (NUMBER_OF_DRIVERS*16)-2);
+			__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, (NUMBER_OF_DRIVERS*16)-3);
 			number_of_pulses++;
 		}
 		else if(number_of_pulses==15){
@@ -547,6 +549,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+
 	  HAL_GPIO_WritePin(Enable_GPIO_Port, Enable_Pin, GPIO_PIN_RESET);
 	  HAL_SPI_Transmit_DMA(&hspi2, (uint8_t*)spi_dummy_buffer_empty, 16*NUMBER_OF_DRIVERS);
 }
