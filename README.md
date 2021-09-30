@@ -1,5 +1,6 @@
 # STM32 led rgb matrix driver
 
+### About
 This project was used for my master's thesis. Main goal of this project was to develop a method of displacing the light source in active character displays used in ITS systems and to develop a prototype RGB LED display model with a remote fiber optic panel. Single pixel of said matix was developed, since to create a display there is only a need for replication of it and minor changes to a source code to deal with displaying graphics. Displacing the light source form its projection place was achvived by using a PMMA optical fibre connected to LEDs by optical coupler. 
 
 STM32 NUCLEO-F446RE provides control over cascade of [**Macroblocks MBI5030**](https://www.neumueller.com/datenblatt/macroblock/MBI5030%20Datenblatt%20-%20Datasheet.pdf) (16-Channel Constat Current LED Driver With 16-bit PWM) via SPI-like interface, which drive LEDs making a single pixel. 
